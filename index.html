@@ -3,59 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resistor Master: High Contrast</title>
+    <title>Resistor Master: Dog Bone Shape</title>
     <style>
         :root {
-            --bg-color: #2c3e50;
-            --card-bg: #ecf0f1;
+            --bg-color: #eef2f3;
+            --card-bg: #ffffff;
             --text-color: #2c3e50;
-            --accent: #3498db;
-            --success: #27ae60;
-            --error: #c0392b;
+            --accent-color: #34495e;
+            --btn-primary: #2980b9;
+            --btn-hover: #1c5980;
+            --correct: #27ae60;
+            --wrong: #c0392b;
             
-            /* Component Colors */
-            --resistor-base: #e0cda8; 
-            --resistor-shadow: #bfa575;
+            /* Realistic Resistor Colors */
+            --resistor-base: #e0cda8; /* Classic Tan/Beige */
+            --wire-gradient: linear-gradient(to bottom, #d7d7d7 0%, #999 40%, #555 100%);
             
-            /* --- HIGH CONTRAST COLOR PALETTE --- */
-            
-            /* 1. BLACK (0) - Pure Black */
-            --r-black: #000000;
-            
-            /* 2. BROWN (1) */
-            --r-brown: #5e3313;
-            
-            /* 3. RED (2) - Bright Pure Red */
-            --r-red: #ff0000; 
-            
-            /* 4. ORANGE (3) - Distinct Safety Orange */
-            --r-orange: #ff7f00; 
-            
-            /* 5. YELLOW (4) - Pure Bright Yellow */
-            --r-yellow: #ffff00; 
-            
-            /* 6. GREEN (5) */
-            --r-green: #27ae60;
-            
-            /* 7. BLUE (6) */
-            --r-blue: #2980b9;
-            
-            /* 8. VIOLET (7) */
-            --r-violet: #8e44ad;
-            
-            /* 9. GREY (8) - CHANGED: Made significantly darker (Charcoal) to separate from Silver */
-            --r-grey: #555555;
-            
-            /* 10. WHITE (9) - Pure White */
-            --r-white: #ffffff;
-            
-            /* TOLERANCE COLORS */
-            
-            /* GOLD (5%) - Dark Mustard/Bronze to contrast with Yellow */
-            --r-gold: #b8860b; 
-            
-            /* SILVER (10%) - CHANGED: Made very light to contrast with Grey */
-            --r-silver: #e0e0e0;
+            /* The 3D lighting overlay for the ceramic body */
+            --ceramic-lighting: linear-gradient(to bottom, 
+                rgba(255,255,255,0.6) 0%, 
+                rgba(255,255,255,0.1) 30%, 
+                rgba(0,0,0,0.05) 60%, 
+                rgba(0,0,0,0.3) 100%
+            );
         }
 
         body {
@@ -67,422 +37,654 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
         }
 
-        h1 { color: #fff; margin-bottom: 5px; text-align: center; }
-        p.subtitle { color: #bdc3c7; margin-top: 0; margin-bottom: 20px; }
-
-        .game-container {
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
             background: var(--card-bg);
             width: 100%;
-            max-width: 600px;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        /* SCORE BOARD */
-        .stats-bar {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-bottom: 30px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            color: #555;
-            background: rgba(0,0,0,0.05);
-            padding: 10px;
-            border-radius: 8px;
-        }
-
-        /* --- RESISTOR GRAPHICS --- */
-        .resistor-stage {
-            position: relative;
-            width: 320px;
-            height: 120px;
-            display: flex;
-            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             justify-content: center;
             margin-bottom: 20px;
+            z-index: 10;
         }
 
+        .tab-btn {
+            padding: 15px 30px;
+            border: none;
+            background: transparent;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: 700;
+            color: #95a5a6;
+            border-bottom: 4px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            color: var(--btn-primary);
+            border-bottom: 4px solid var(--btn-primary);
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            margin-bottom: 2rem;
+        }
+
+        .hidden { display: none !important; }
+
+        h1 { margin-bottom: 0.5rem; color: var(--accent-color); }
+        p { color: #7f8c8d; margin-bottom: 1.5rem; }
+
+        /* --- DOG BONE RESISTOR VISUALS --- */
+        .resistor-stage {
+            position: relative;
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2.5rem;
+            background-image: radial-gradient(#bdc3c7 1px, transparent 1px);
+            background-size: 20px 20px;
+            border-radius: 10px;
+            border: 1px solid #ecf0f1;
+            overflow: hidden;
+        }
+
+        /* The Wire (Goes all the way through) */
         .wire {
             position: absolute;
-            width: 100%;
-            height: 6px;
-            background: linear-gradient(to bottom, #bdc3c7, #7f8c8d, #bdc3c7);
+            width: 90%;
+            height: 10px;
+            background: var(--wire-gradient);
             z-index: 0;
-            border-radius: 3px;
+            box-shadow: 0 4px 4px rgba(0,0,0,0.2);
         }
 
-        .resistor-parts {
+        /* The "Dog Bone" Assembly */
+        .resistor-assembly {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: relative;
             z-index: 1;
-            display: flex;
-            align-items: center;
-            filter: drop-shadow(0 8px 10px rgba(0,0,0,0.3));
+            /* This filter creates the shadow for the complex shape */
+            filter: drop-shadow(0 15px 10px rgba(0,0,0,0.3));
         }
 
-        .ceramic-bg {
-            background: linear-gradient(to bottom, 
-                var(--resistor-base) 0%, 
-                #fff5e0 40%, 
-                var(--resistor-base) 60%, 
-                var(--resistor-shadow) 100%);
-        }
-
-        .cap-left {
-            width: 50px;
-            height: 70px;
-            border-radius: 10px 5px 5px 10px;
+        /* Shared styles for ceramic parts */
+        .ceramic-part {
+            background-color: var(--resistor-base);
             position: relative;
-            display: flex;
-            justify-content: center; 
-            overflow: hidden;
-        }
-
-        .body-center {
-            width: 120px;
-            height: 55px; 
-            display: flex;
-            justify-content: space-evenly;
-            align-items: stretch;
-            overflow: hidden;
-        }
-
-        .cap-right {
-            width: 50px;
-            height: 70px;
-            border-radius: 5px 10px 10px 5px;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        /* --- BAND STYLING --- */
-        .band {
-            width: 18px;
-            height: 100%;
-            opacity: 1; 
-            /* Gloss overlay to give 3D effect without altering the base color too much */
-            background-image: linear-gradient(to right, 
-                rgba(0,0,0,0.1) 0%, 
-                rgba(255,255,255,0.5) 35%, 
-                rgba(0,0,0,0.1) 100%);
-            box-shadow: 0 0 2px rgba(0,0,0,0.2);
+            overflow: hidden; /* Clips the bands */
         }
         
-        .cap-left .band { margin-left: 10px; } 
-        .cap-right .band { margin-right: 10px; }
+        /* The Shine Overlay (Pseudo-element for all parts) */
+        .ceramic-part::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--ceramic-lighting);
+            z-index: 10; /* On top of bands */
+            pointer-events: none;
+        }
 
-        /* --- CONTROLS --- */
-        .message-area {
-            height: 40px;
-            margin: 10px 0;
-            font-weight: bold;
-            text-align: center;
+        /* Left Bulb (Cap) */
+        .cap-left {
+            width: 60px;
+            height: 80px;
+            border-radius: 15px 0 0 15px;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-right: -2px; /* Seamless join */
         }
 
+        /* Center Bridge (Narrower) */
+        .bridge {
+            width: 140px;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
+            z-index: 2; /* Sits visually connected */
+        }
+
+        /* Right Bulb (Cap) */
+        .cap-right {
+            width: 60px;
+            height: 80px;
+            border-radius: 0 15px 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: -2px; /* Seamless join */
+        }
+
+        /* The Color Bands */
+        .band {
+            width: 20px;
+            height: 100%;
+            background-color: transparent;
+            position: relative;
+            z-index: 5; /* Under the shine, over the base */
+        }
+
+        /* Specific Band Positioning */
+        /* Band 1 is on the left cap */
+        .cap-left .band { width: 25px; margin-left: 5px; }
+        
+        /* Band 4 is on the right cap */
+        .cap-right .band { width: 25px; margin-right: 5px; }
+
+        /* Bands 2 & 3 are on the bridge */
+        .bridge .band { width: 25px; }
+
+
+        /* --- CONTROLS & INPUTS --- */
         .options-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            width: 100%;
+            gap: 12px;
+            margin-bottom: 1.5rem;
         }
 
-        button {
+        button.game-btn {
             padding: 15px;
             font-size: 1.1rem;
-            border: none;
-            border-radius: 8px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            background: white;
             cursor: pointer;
-            background-color: #fff;
+            font-weight: 600;
             color: var(--text-color);
-            box-shadow: 0 4px 0px rgba(0,0,0,0.1);
-            border: 1px solid #ddd;
-            transition: all 0.1s;
+            transition: transform 0.1s, background 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        button.game-btn:hover { background-color: #f7f9f9; transform: translateY(-2px); }
+        button.game-btn:active { transform: translateY(0); }
+        
+        button.game-btn.correct { 
+            background-color: var(--correct); 
+            color: white; 
+            border-color: var(--correct);
+            box-shadow: 0 0 15px rgba(39, 174, 96, 0.4);
+        }
+        
+        button.game-btn.wrong { 
+            background-color: var(--wrong); 
+            color: white; 
+            border-color: var(--wrong); 
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
             font-weight: bold;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid #f0f0f0;
+            color: var(--accent-color);
         }
 
-        button:active { transform: translateY(4px); box-shadow: none; }
-        button:hover { background-color: #f8f9fa; border-color: #ccc; }
+        /* Calculator Inputs */
+        .calc-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            text-align: left;
+        }
 
-        .btn-correct { background-color: var(--success) !important; color: white !important; border-color: #219150 !important; }
-        .btn-wrong { background-color: var(--error) !important; color: white !important; border-color: #a93226 !important; }
-
-        /* CHEAT SHEET */
-        .cheat-sheet-toggle {
-            margin-top: 25px;
-            background: none;
-            border: 2px dashed #bdc3c7;
+        .control-group label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             color: #7f8c8d;
-            font-size: 0.9rem;
-            padding: 8px 16px;
-            box-shadow: none;
+            margin-bottom: 5px;
+            display: block;
         }
-        .cheat-sheet-toggle:hover { background: #fff; }
 
-        .cheat-sheet {
-            display: none;
-            width: 100%;
-            margin-top: 15px;
-            background: #fff;
-            padding: 15px;
+        select, input[type="number"] {
+            padding: 12px;
             border-radius: 8px;
-            font-size: 0.9rem;
+            border: 1px solid #bdc3c7;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            background: #fafafa;
+            color: #333;
+        }
+        
+        .calc-result {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            border: 2px solid #e0e0e0;
+            font-family: 'Courier New', Courier, monospace;
         }
 
-        .cheat-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 5px;
+        /* Cheat Sheet */
+        .cheat-sheet {
+            margin-top: 20px;
+            font-size: 0.85rem;
+            text-align: left;
+            background: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            display: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
         }
-
-        .color-row { display: flex; align-items: center; padding: 3px 0; }
-        .c-box { width: 20px; height: 20px; margin-right: 8px; border: 1px solid #999; border-radius: 3px; }
+        .cheat-sheet.visible { display: block; }
+        .color-row { display: flex; align-items: center; margin-bottom: 6px; padding: 4px; border-radius: 4px; }
+        .color-row:nth-child(odd) { background: #f9f9f9; }
+        .color-box { width: 20px; height: 20px; margin-right: 12px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); box-shadow: inset 0 0 2px rgba(0,0,0,0.2); }
 
         @media (max-width: 500px) {
-            .resistor-stage { transform: scale(0.85); }
-            .options-grid { grid-template-columns: 1fr; }
+            .cap-left, .cap-right { width: 40px; height: 60px; }
+            .bridge { width: 100px; height: 40px; }
+            .band { width: 15px !important; }
+            .container { padding: 1rem; }
         }
     </style>
 </head>
 <body>
 
-    <h1>Resistor Master</h1>
-    <p class="subtitle">Calculate Resistance & Tolerance</p>
+    <!-- Navigation -->
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchMode('game')">Practice Game</button>
+        <button class="tab-btn" onclick="switchMode('calc')">Calculator</button>
+    </div>
 
-    <div class="game-container">
-        <div class="stats-bar">
+    <!-- GAME MODE -->
+    <div id="game-container" class="container">
+        <h1>Resistor Practice</h1>
+        <p>Identify the resistance value.</p>
+
+        <div class="resistor-stage">
+            <div class="wire"></div>
+            <!-- The Dog Bone Shape -->
+            <div class="resistor-assembly">
+                <div class="ceramic-part cap-left">
+                    <div class="band" id="g-band1"></div>
+                </div>
+                <div class="ceramic-part bridge">
+                    <div class="band" id="g-band2"></div>
+                    <div class="band" id="g-band3"></div>
+                </div>
+                <div class="ceramic-part cap-right">
+                    <div class="band" id="g-band4"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="options-grid" id="options-container"></div>
+
+        <div class="stats">
             <span>Score: <span id="score">0</span></span>
             <span>Streak: <span id="streak">0</span></span>
         </div>
 
+        <button onclick="toggleCheatSheet()" style="margin-top: 20px; background:none; border:none; text-decoration:underline; color:#7f8c8d; cursor:pointer; font-size:0.9rem;">Toggle Color Code Chart</button>
+    </div>
+
+    <!-- CALCULATOR MODE -->
+    <div id="calc-container" class="container hidden">
+        <h1>Resistor Calculator</h1>
+        <p>Select colors or type a value.</p>
+
         <div class="resistor-stage">
             <div class="wire"></div>
-            
-            <div class="resistor-parts">
-                <!-- Left Cap: Holds Band 1 -->
-                <div class="cap-left ceramic-bg">
-                    <div class="band" id="band1"></div>
+            <!-- The Dog Bone Shape -->
+            <div class="resistor-assembly">
+                <div class="ceramic-part cap-left">
+                    <div class="band" id="c-band1"></div>
                 </div>
-
-                <!-- Center Body: Holds Band 2 and 3 -->
-                <div class="body-center ceramic-bg">
-                    <div class="band" id="band2"></div>
-                    <div class="band" id="band3"></div>
+                <div class="ceramic-part bridge">
+                    <div class="band" id="c-band2"></div>
+                    <div class="band" id="c-band3"></div>
                 </div>
-
-                <!-- Right Cap: Holds Tolerance Band -->
-                <div class="cap-right ceramic-bg">
-                    <div class="band" id="band4"></div>
+                <div class="ceramic-part cap-right">
+                    <div class="band" id="c-band4"></div>
                 </div>
             </div>
         </div>
 
-        <div class="message-area" id="message">Select the correct value</div>
-
-        <div class="options-grid" id="options-container">
-            <!-- Buttons generated by JS -->
+        <div class="calc-result" id="calc-display">
+            1 kΩ ± 5%
         </div>
 
-        <button class="cheat-sheet-toggle" onclick="toggleCheatSheet()">Show Color Code Chart</button>
-
-        <div class="cheat-sheet" id="cheat-sheet">
-            <div class="cheat-grid">
-                <div><strong>Values (Digits)</strong></div>
-                <div><strong>Tolerance</strong></div>
-                
-                <div class="color-row"><div class="c-box" style="background:var(--r-black)"></div> Blk: 0</div>
-                <div class="color-row"><div class="c-box" style="background:var(--r-gold)"></div> Gold: ±5%</div>
-
-                <div class="color-row"><div class="c-box" style="background:var(--r-brown)"></div> Brn: 1</div>
-                <div class="color-row"><div class="c-box" style="background:var(--r-silver)"></div> Silv: ±10%</div>
-
-                <div class="color-row"><div class="c-box" style="background:var(--r-red)"></div> Red: 2</div>
-                <div></div>
-
-                <div class="color-row"><div class="c-box" style="background:var(--r-orange)"></div> Org: 3</div>
-                <div></div>
-                <div class="color-row"><div class="c-box" style="background:var(--r-yellow)"></div> Yel: 4</div>
-                <div></div>
-                <div class="color-row"><div class="c-box" style="background:var(--r-green)"></div> Grn: 5</div>
-                <div></div>
-                <div class="color-row"><div class="c-box" style="background:var(--r-blue)"></div> Blu: 6</div>
-                <div></div>
-                <div class="color-row"><div class="c-box" style="background:var(--r-violet)"></div> Vio: 7</div>
-                <div></div>
-                <div class="color-row"><div class="c-box" style="background:var(--r-grey)"></div> Gry: 8</div>
-                <div></div>
-                <div class="color-row"><div class="c-box" style="background:var(--r-white)"></div> Wht: 9</div>
+        <div class="calc-controls">
+            <div class="control-group">
+                <label>Resistance Value (Ohms)</label>
+                <input type="number" id="ohm-input" placeholder="e.g. 4700" oninput="updateFromInput()">
             </div>
-            <div style="margin-top:10px; font-size:0.8rem; text-align:center; color:#666;">
-                Band 1 & 2: Digits | Band 3: Multiplier (Zeros) | Band 4: Tolerance
+
+            <div class="options-grid">
+                <div class="control-group">
+                    <label>1st Band</label>
+                    <select id="sel-band1" onchange="updateFromSelects()"></select>
+                </div>
+                <div class="control-group">
+                    <label>2nd Band</label>
+                    <select id="sel-band2" onchange="updateFromSelects()"></select>
+                </div>
+                <div class="control-group">
+                    <label>Multiplier</label>
+                    <select id="sel-band3" onchange="updateFromSelects()"></select>
+                </div>
+                <div class="control-group">
+                    <label>Tolerance</label>
+                    <select id="sel-band4" onchange="updateFromSelects()"></select>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- Shared Cheat Sheet -->
+    <div id="cheat-sheet" class="container cheat-sheet">
+        <h3 style="margin-top:0; color:var(--accent-color);">Color Code Reference</h3>
+        <div id="legend-container"></div>
+    </div>
+
     <script>
-        let score = 0;
-        let streak = 0;
-        let currentResistor = {};
-        let gameActive = true;
-
+        // --- DATA & CONFIG ---
         const colors = [
-            { name: 'black', hex: 'var(--r-black)' },
-            { name: 'brown', hex: 'var(--r-brown)' },
-            { name: 'red', hex: 'var(--r-red)' },
-            { name: 'orange', hex: 'var(--r-orange)' },
-            { name: 'yellow', hex: 'var(--r-yellow)' },
-            { name: 'green', hex: 'var(--r-green)' },
-            { name: 'blue', hex: 'var(--r-blue)' },
-            { name: 'violet', hex: 'var(--r-violet)' },
-            { name: 'grey', hex: 'var(--r-grey)' },
-            { name: 'white', hex: 'var(--r-white)' }
+            { name: "Black", hex: "#000000", val: 0, mult: 1 },
+            { name: "Brown", hex: "#5e3828", val: 1, mult: 10, tol: 1 },
+            { name: "Red", hex: "#c0392b", val: 2, mult: 100, tol: 2 },
+            { name: "Orange", hex: "#d35400", val: 3, mult: 1000 },
+            { name: "Yellow", hex: "#f1c40f", val: 4, mult: 10000 },
+            { name: "Green", hex: "#27ae60", val: 5, mult: 100000, tol: 0.5 },
+            { name: "Blue", hex: "#2980b9", val: 6, mult: 1000000, tol: 0.25 },
+            { name: "Violet", hex: "#8e44ad", val: 7, mult: 10000000, tol: 0.1 },
+            { name: "Grey", hex: "#7f8c8d", val: 8, mult: null, tol: 0.05 },
+            { name: "White", hex: "#ecf0f1", val: 9, mult: null },
+            { name: "Gold", hex: "#cfb53b", val: null, mult: 0.1, tol: 5 },
+            { name: "Silver", hex: "#bdc3c7", val: null, mult: 0.01, tol: 10 }
         ];
 
-        const tolerances = [
-            { name: 'gold', hex: 'var(--r-gold)', text: '±5%' },
-            { name: 'silver', hex: 'var(--r-silver)', text: '±10%' }
-        ];
-
-        function formatValue(ohms, tol) {
-            let valStr = "";
-            if (ohms >= 1000000) {
-                valStr = (ohms / 1000000) + (ohms % 1000000 === 0 ? '' : '.' + Math.floor((ohms % 1000000)/100000)) + ' MΩ';
-            } else if (ohms >= 1000) {
-                valStr = (ohms / 1000) + (ohms % 1000 === 0 ? '' : '.' + Math.floor((ohms % 1000)/100)) + ' kΩ';
-            } else {
-                valStr = ohms + ' Ω';
-            }
-            return `${valStr} ${tol}`;
+        // --- SHARED UTILS ---
+        function formatOhms(ohms) {
+            if (ohms >= 1000000) return (ohms / 1000000) + " MΩ";
+            if (ohms >= 1000) return (ohms / 1000) + " kΩ";
+            return ohms + " Ω";
         }
 
-        function newRound() {
-            gameActive = true;
-            document.getElementById('message').textContent = "Calculate Resistance & Tolerance";
-            document.getElementById('message').style.color = "#2c3e50";
+        function setBandColor(elementId, colorObj) {
+            const el = document.getElementById(elementId);
+            
+            // Metallic sparkle effect
+            if (colorObj.name === "Gold") {
+                el.style.background = `linear-gradient(to right, #b8860b, #ffd700, #b8860b)`;
+            } else if (colorObj.name === "Silver") {
+                el.style.background = `linear-gradient(to right, #7f8c8d, #ecf0f1, #7f8c8d)`;
+            } else {
+                el.style.background = colorObj.hex;
+            }
+            // Add subtle shadow to sides of band to make it look painted on round surface
+            el.style.boxShadow = "inset 2px 0 2px rgba(0,0,0,0.2), inset -2px 0 2px rgba(0,0,0,0.2)";
+        }
 
-            // 1. Generate Values
-            // Band 1: 1-9 (Brown to White)
-            const b1 = Math.floor(Math.random() * 9) + 1; 
-            // Band 2: 0-9 (Black to White)
-            const b2 = Math.floor(Math.random() * 10);    
-            // Band 3: 0-6 (Black to Blue) - Keeps numbers reasonable
-            const b3 = Math.floor(Math.random() * 7);     
-            // Tolerance: Gold or Silver
-            const tIndex = Math.random() > 0.5 ? 0 : 1;   
+        // --- MODE SWITCHING ---
+        function switchMode(mode) {
+            const gameCont = document.getElementById('game-container');
+            const calcCont = document.getElementById('calc-container');
+            const btns = document.querySelectorAll('.tab-btn');
 
-            const ohms = (b1 * 10 + b2) * Math.pow(10, b3);
-            const tolText = tolerances[tIndex].text;
+            if (mode === 'game') {
+                gameCont.classList.remove('hidden');
+                calcCont.classList.add('hidden');
+                btns[0].classList.add('active');
+                btns[1].classList.remove('active');
+            } else {
+                gameCont.classList.add('hidden');
+                calcCont.classList.remove('hidden');
+                btns[0].classList.remove('active');
+                btns[1].classList.add('active');
+                updateFromSelects(); 
+            }
+        }
+
+        // --- GAME LOGIC ---
+        let currentResistor = {};
+        let score = 0;
+        let streak = 0;
+
+        function generateResistor() {
+            const d1 = Math.floor(Math.random() * 9) + 1; 
+            const d2 = Math.floor(Math.random() * 10);
+            const multIdx = Math.floor(Math.random() * 8); 
+            const tolOptions = [1, 2, 5, 6, 7, 8, 10, 11];
+            const tolIdx = tolOptions[Math.floor(Math.random() * tolOptions.length)];
+
+            const color1 = colors.find(c => c.val === d1);
+            const color2 = colors.find(c => c.val === d2);
+            const color3 = colors[multIdx];
+            const color4 = colors[tolIdx];
+
+            const value = (d1 * 10 + d2) * color3.mult;
 
             currentResistor = {
-                ohms: ohms,
-                tolText: tolText,
-                fullString: formatValue(ohms, tolText)
+                value: value,
+                tolerance: color4.tol,
+                c1: color1,
+                c2: color2,
+                c3: color3,
+                c4: color4
             };
 
-            // 2. Update Visuals
-            document.getElementById('band1').style.backgroundColor = colors[b1].hex;
-            document.getElementById('band2').style.backgroundColor = colors[b2].hex;
-            document.getElementById('band3').style.backgroundColor = colors[b3].hex;
-            document.getElementById('band4').style.backgroundColor = tolerances[tIndex].hex;
+            setBandColor('g-band1', color1);
+            setBandColor('g-band2', color2);
+            setBandColor('g-band3', color3);
+            setBandColor('g-band4', color4);
 
-            // 3. Generate Options
-            let options = [];
-            // Add correct answer
-            options.push({ ohms: ohms, tol: tolText, correct: true });
+            generateOptions(value);
+        }
 
-            // Generate Distractors
+        function generateOptions(correctValue) {
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            let options = [correctValue];
             while (options.length < 4) {
-                let type = Math.floor(Math.random() * 3);
-                let fakeOhms = ohms;
-                let fakeTol = tolText;
-
-                if (type === 0) {
-                    // Wrong Tolerance
-                    fakeTol = (tolText === '±5%') ? '±10%' : '±5%';
-                } else if (type === 1) {
-                    // Wrong Multiplier
-                    let shift = Math.random() > 0.5 ? 10 : 0.1;
-                    fakeOhms = ohms * shift;
+                let wrongVal;
+                const type = Math.random();
+                if (type < 0.5) {
+                    wrongVal = correctValue * 10;
                 } else {
-                    // Wrong Digits (similar range)
-                    let fakeB2 = (b2 + 1) % 10;
-                    fakeOhms = (b1 * 10 + fakeB2) * Math.pow(10, b3);
+                    wrongVal = correctValue + (Math.floor(Math.random() * 5) * (correctValue/10));
                 }
-
-                // Check for duplicates
-                let exists = options.some(o => o.ohms === fakeOhms && o.tol === fakeTol);
                 
-                // Filter out crazy values
-                if (!exists && fakeOhms >= 1) {
-                    options.push({ ohms: fakeOhms, tol: fakeTol, correct: false });
+                if (!options.includes(wrongVal) && wrongVal > 0) {
+                    options.push(wrongVal);
+                } else {
+                    options.push(Math.floor(Math.random() * 10000));
                 }
             }
 
-            // Shuffle
             options.sort(() => Math.random() - 0.5);
 
-            // Render Buttons
-            const container = document.getElementById('options-container');
-            container.innerHTML = '';
-            
             options.forEach(opt => {
                 const btn = document.createElement('button');
-                btn.textContent = formatValue(opt.ohms, opt.tol);
+                btn.className = 'game-btn';
+                btn.textContent = formatOhms(opt);
                 btn.onclick = () => checkAnswer(opt, btn);
                 container.appendChild(btn);
             });
         }
 
-        function checkAnswer(option, btnElement) {
-            if (!gameActive) return;
-            gameActive = false;
+        function checkAnswer(selectedValue, btnElement) {
+            const buttons = document.querySelectorAll('.game-btn');
+            buttons.forEach(b => b.disabled = true);
 
-            const btns = document.querySelectorAll('.options-grid button');
-
-            if (option.correct) {
+            if (selectedValue === currentResistor.value) {
+                btnElement.classList.add('correct');
                 score += 10;
                 streak++;
-                document.getElementById('message').textContent = "Correct!";
-                document.getElementById('message').style.color = "var(--success)";
-                btnElement.classList.add('btn-correct');
+                setTimeout(() => {
+                    generateResistor();
+                    updateStats();
+                }, 1000);
             } else {
+                btnElement.classList.add('wrong');
                 streak = 0;
-                document.getElementById('message').textContent = `Wrong! It was ${currentResistor.fullString}`;
-                document.getElementById('message').style.color = "var(--error)";
-                btnElement.classList.add('btn-wrong');
-                
-                // Highlight correct
-                btns.forEach(b => {
-                    if (b.textContent === currentResistor.fullString) {
-                        b.classList.add('btn-correct');
+                buttons.forEach(b => {
+                    if (b.textContent === formatOhms(currentResistor.value)) {
+                        b.classList.add('correct');
                     }
                 });
+                setTimeout(() => {
+                    generateResistor();
+                    updateStats();
+                }, 1500);
             }
+            updateStats();
+        }
 
+        function updateStats() {
             document.getElementById('score').textContent = score;
             document.getElementById('streak').textContent = streak;
-
-            setTimeout(newRound, 2000);
         }
 
+        // --- CALCULATOR LOGIC ---
+
+        function initCalculator() {
+            const s1 = document.getElementById('sel-band1');
+            const s2 = document.getElementById('sel-band2');
+            const s3 = document.getElementById('sel-band3');
+            const s4 = document.getElementById('sel-band4');
+
+            colors.forEach((c, i) => {
+                if (c.val !== null) {
+                    s1.add(new Option(c.name, i));
+                    s2.add(new Option(c.name, i));
+                }
+                if (c.mult !== null) {
+                    s3.add(new Option(c.name, i));
+                }
+                if (c.tol !== undefined) {
+                    s4.add(new Option(`${c.name} (±${c.tol}%)`, i));
+                }
+            });
+
+            s1.value = 1; // Brown
+            s2.value = 0; // Black
+            s3.value = 2; // Red
+            s4.value = 10; // Gold
+            
+            updateFromSelects();
+        }
+
+        function updateFromSelects() {
+            const i1 = parseInt(document.getElementById('sel-band1').value);
+            const i2 = parseInt(document.getElementById('sel-band2').value);
+            const i3 = parseInt(document.getElementById('sel-band3').value);
+            const i4 = parseInt(document.getElementById('sel-band4').value);
+
+            const c1 = colors[i1];
+            const c2 = colors[i2];
+            const c3 = colors[i3];
+            const c4 = colors[i4];
+
+            setBandColor('c-band1', c1);
+            setBandColor('c-band2', c2);
+            setBandColor('c-band3', c3);
+            setBandColor('c-band4', c4);
+
+            const ohms = (c1.val * 10 + c2.val) * c3.mult;
+            document.getElementById('calc-display').textContent = `${formatOhms(ohms)} ± ${c4.tol}%`;
+            
+            const inputEl = document.getElementById('ohm-input');
+            if (document.activeElement !== inputEl) {
+                inputEl.value = ohms;
+            }
+        }
+
+        function updateFromInput() {
+            let val = parseFloat(document.getElementById('ohm-input').value);
+            if (isNaN(val) || val <= 0) return;
+
+            let strVal = val.toPrecision(2); 
+            let scientific = parseFloat(strVal).toExponential(); 
+            
+            let parts = scientific.split('e');
+            let base = parseFloat(parts[0]);
+            let exponent = parseInt(parts[1]);
+
+            let digitNum = Math.round(base * 10); 
+            let multNum = exponent - 1;
+
+            let d1 = Math.floor(digitNum / 10);
+            let d2 = digitNum % 10;
+
+            let idx1 = colors.findIndex(c => c.val === d1);
+            let idx2 = colors.findIndex(c => c.val === d2);
+            let idx3 = -1;
+            
+            if (multNum >= 0 && multNum <= 9) {
+                idx3 = colors.findIndex(c => Math.log10(c.mult || 0.00001) === multNum);
+            } else if (multNum === -1) {
+                idx3 = 10; // Gold
+            } else if (multNum === -2) {
+                idx3 = 11; // Silver
+            }
+
+            if (idx1 > -1 && idx2 > -1 && idx3 > -1) {
+                document.getElementById('sel-band1').value = idx1;
+                document.getElementById('sel-band2').value = idx2;
+                document.getElementById('sel-band3').value = idx3;
+                updateFromSelects();
+            }
+        }
+
+        // --- CHEAT SHEET ---
         function toggleCheatSheet() {
-            const sheet = document.getElementById('cheat-sheet');
-            sheet.style.display = (sheet.style.display === 'block') ? 'none' : 'block';
+            document.getElementById('cheat-sheet').classList.toggle('visible');
         }
 
-        // Init
-        newRound();
+        function buildCheatSheet() {
+            const container = document.getElementById('legend-container');
+            colors.forEach(c => {
+                const row = document.createElement('div');
+                row.className = 'color-row';
+                
+                const box = document.createElement('div');
+                box.className = 'color-box';
+                box.style.backgroundColor = c.hex;
+                
+                const text = document.createElement('span');
+                let desc = `<b>${c.name}</b>: `;
+                if (c.val !== null) desc += `Digit ${c.val}, `;
+                if (c.mult !== null) desc += `Mult 10^${Math.log10(c.mult).toFixed(0).replace('-Infinity', '0')}, `;
+                if (c.tol !== undefined) desc += `Tol ±${c.tol}%`;
+                
+                text.innerHTML = desc;
+                row.appendChild(box);
+                row.appendChild(text);
+                container.appendChild(row);
+            });
+        }
+
+        // --- INIT ---
+        generateResistor();
+        buildCheatSheet();
+        initCalculator();
 
     </script>
 </body>
