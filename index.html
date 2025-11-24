@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resistor Master: High Contrast</title>
+    <style>
+        :root {
+            --bg-color: #2c3e50;
+            --card-bg: #ecf0f1;
+            --text-color: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --error: #c0392b;
+            
+            /* Component Colors */
+            --resistor-base: #e0cda8; 
+            --resistor-shadow: #bfa575;
+            
+            /* --- HIGH CONTRAST COLOR PALETTE --- */
+            
+            /* 1. BLACK (0) - Pure Black */
+            --r-black: #000000;
+            
+            /* 2. BROWN (1) */
+            --r-brown: #5e3313;
+            
+            /* 3. RED (2) - Bright Pure Red */
+            --r-red: #ff0000; 
+            
+            /* 4. ORANGE (3) - Distinct Safety Orange */
+            --r-orange: #ff7f00; 
+            
+            /* 5. YELLOW (4) - Pure Bright Yellow */
+            --r-yellow: #ffff00; 
+            
+            /* 6. GREEN (5) */
+            --r-green: #27ae60;
+            
+            /* 7. BLUE (6) */
+            --r-blue: #2980b9;
+            
+            /* 8. VIOLET (7) */
+            --r-violet: #8e44ad;
+            
+            /* 9. GREY (8) - CHANGED: Made significantly darker (Charcoal) to separate from Silver */
+            --r-grey: #555555;
+            
+            /* 10. WHITE (9) - Pure White */
+            --r-white: #ffffff;
+            
+            /* TOLERANCE COLORS */
+            
+            /* GOLD (5%) - Dark Mustard/Bronze to contrast with Yellow */
+            --r-gold: #b8860b; 
+            
+            /* SILVER (10%) - CHANGED: Made very light to contrast with Grey */
+            --r-silver: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        h1 { color: #fff; margin-bottom: 5px; text-align: center; }
+        p.subtitle { color: #bdc3c7; margin-top: 0; margin-bottom: 20px; }
+
+        .game-container {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 600px;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* SCORE BOARD */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 30px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #555;
+            background: rgba(0,0,0,0.05);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        /* --- RESISTOR GRAPHICS --- */
+        .resistor-stage {
+            position: relative;
+            width: 320px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .wire {
+            position: absolute;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(to bottom, #bdc3c7, #7f8c8d, #bdc3c7);
+            z-index: 0;
+            border-radius: 3px;
+        }
+
+        .resistor-parts {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            filter: drop-shadow(0 8px 10px rgba(0,0,0,0.3));
+        }
+
+        .ceramic-bg {
+            background: linear-gradient(to bottom, 
+                var(--resistor-base) 0%, 
+                #fff5e0 40%, 
+                var(--resistor-base) 60%, 
+                var(--resistor-shadow) 100%);
+        }
+
+        .cap-left {
+            width: 50px;
+            height: 70px;
+            border-radius: 10px 5px 5px 10px;
+            position: relative;
+            display: flex;
+            justify-content: center; 
+            overflow: hidden;
+        }
+
+        .body-center {
+            width: 120px;
+            height: 55px; 
+            display: flex;
+            justify-content: space-evenly;
+            align-items: stretch;
+            overflow: hidden;
+        }
+
+        .cap-right {
+            width: 50px;
+            height: 70px;
+            border-radius: 5px 10px 10px 5px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* --- BAND STYLING --- */
+        .band {
+            width: 18px;
+            height: 100%;
+            opacity: 1; 
+            /* Gloss overlay to give 3D effect without altering the base color too much */
+            background-image: linear-gradient(to right, 
+                rgba(0,0,0,0.1) 0%, 
+                rgba(255,255,255,0.5) 35%, 
+                rgba(0,0,0,0.1) 100%);
+            box-shadow: 0 0 2px rgba(0,0,0,0.2);
+        }
+        
+        .cap-left .band { margin-left: 10px; } 
+        .cap-right .band { margin-right: 10px; }
+
+        /* --- CONTROLS --- */
+        .message-area {
+            height: 40px;
+            margin: 10px 0;
+            font-weight: bold;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: #fff;
+            color: var(--text-color);
+            box-shadow: 0 4px 0px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+            transition: all 0.1s;
+            font-weight: bold;
+        }
+
+        button:active { transform: translateY(4px); box-shadow: none; }
+        button:hover { background-color: #f8f9fa; border-color: #ccc; }
+
+        .btn-correct { background-color: var(--success) !important; color: white !important; border-color: #219150 !important; }
+        .btn-wrong { background-color: var(--error) !important; color: white !important; border-color: #a93226 !important; }
+
+        /* CHEAT SHEET */
+        .cheat-sheet-toggle {
+            margin-top: 25px;
+            background: none;
+            border: 2px dashed #bdc3c7;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            box-shadow: none;
+        }
+        .cheat-sheet-toggle:hover { background: #fff; }
+
+        .cheat-sheet {
+            display: none;
+            width: 100%;
+            margin-top: 15px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .cheat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
+        }
+
+        .color-row { display: flex; align-items: center; padding: 3px 0; }
+        .c-box { width: 20px; height: 20px; margin-right: 8px; border: 1px solid #999; border-radius: 3px; }
+
+        @media (max-width: 500px) {
+            .resistor-stage { transform: scale(0.85); }
+            .options-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Resistor Master</h1>
+    <p class="subtitle">Calculate Resistance & Tolerance</p>
+
+    <div class="game-container">
+        <div class="stats-bar">
+            <span>Score: <span id="score">0</span></span>
+            <span>Streak: <span id="streak">0</span></span>
+        </div>
+
+        <div class="resistor-stage">
+            <div class="wire"></div>
+            
+            <div class="resistor-parts">
+                <!-- Left Cap: Holds Band 1 -->
+                <div class="cap-left ceramic-bg">
+                    <div class="band" id="band1"></div>
+                </div>
+
+                <!-- Center Body: Holds Band 2 and 3 -->
+                <div class="body-center ceramic-bg">
+                    <div class="band" id="band2"></div>
+                    <div class="band" id="band3"></div>
+                </div>
+
+                <!-- Right Cap: Holds Tolerance Band -->
+                <div class="cap-right ceramic-bg">
+                    <div class="band" id="band4"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="message-area" id="message">Select the correct value</div>
+
+        <div class="options-grid" id="options-container">
+            <!-- Buttons generated by JS -->
+        </div>
+
+        <button class="cheat-sheet-toggle" onclick="toggleCheatSheet()">Show Color Code Chart</button>
+
+        <div class="cheat-sheet" id="cheat-sheet">
+            <div class="cheat-grid">
+                <div><strong>Values (Digits)</strong></div>
+                <div><strong>Tolerance</strong></div>
+                
+                <div class="color-row"><div class="c-box" style="background:var(--r-black)"></div> Blk: 0</div>
+                <div class="color-row"><div class="c-box" style="background:var(--r-gold)"></div> Gold: ±5%</div>
+
+                <div class="color-row"><div class="c-box" style="background:var(--r-brown)"></div> Brn: 1</div>
+                <div class="color-row"><div class="c-box" style="background:var(--r-silver)"></div> Silv: ±10%</div>
+
+                <div class="color-row"><div class="c-box" style="background:var(--r-red)"></div> Red: 2</div>
+                <div></div>
+
+                <div class="color-row"><div class="c-box" style="background:var(--r-orange)"></div> Org: 3</div>
+                <div></div>
+                <div class="color-row"><div class="c-box" style="background:var(--r-yellow)"></div> Yel: 4</div>
+                <div></div>
+                <div class="color-row"><div class="c-box" style="background:var(--r-green)"></div> Grn: 5</div>
+                <div></div>
+                <div class="color-row"><div class="c-box" style="background:var(--r-blue)"></div> Blu: 6</div>
+                <div></div>
+                <div class="color-row"><div class="c-box" style="background:var(--r-violet)"></div> Vio: 7</div>
+                <div></div>
+                <div class="color-row"><div class="c-box" style="background:var(--r-grey)"></div> Gry: 8</div>
+                <div></div>
+                <div class="color-row"><div class="c-box" style="background:var(--r-white)"></div> Wht: 9</div>
+            </div>
+            <div style="margin-top:10px; font-size:0.8rem; text-align:center; color:#666;">
+                Band 1 & 2: Digits | Band 3: Multiplier (Zeros) | Band 4: Tolerance
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let streak = 0;
+        let currentResistor = {};
+        let gameActive = true;
+
+        const colors = [
+            { name: 'black', hex: 'var(--r-black)' },
+            { name: 'brown', hex: 'var(--r-brown)' },
+            { name: 'red', hex: 'var(--r-red)' },
+            { name: 'orange', hex: 'var(--r-orange)' },
+            { name: 'yellow', hex: 'var(--r-yellow)' },
+            { name: 'green', hex: 'var(--r-green)' },
+            { name: 'blue', hex: 'var(--r-blue)' },
+            { name: 'violet', hex: 'var(--r-violet)' },
+            { name: 'grey', hex: 'var(--r-grey)' },
+            { name: 'white', hex: 'var(--r-white)' }
+        ];
+
+        const tolerances = [
+            { name: 'gold', hex: 'var(--r-gold)', text: '±5%' },
+            { name: 'silver', hex: 'var(--r-silver)', text: '±10%' }
+        ];
+
+        function formatValue(ohms, tol) {
+            let valStr = "";
+            if (ohms >= 1000000) {
+                valStr = (ohms / 1000000) + (ohms % 1000000 === 0 ? '' : '.' + Math.floor((ohms % 1000000)/100000)) + ' MΩ';
+            } else if (ohms >= 1000) {
+                valStr = (ohms / 1000) + (ohms % 1000 === 0 ? '' : '.' + Math.floor((ohms % 1000)/100)) + ' kΩ';
+            } else {
+                valStr = ohms + ' Ω';
+            }
+            return `${valStr} ${tol}`;
+        }
+
+        function newRound() {
+            gameActive = true;
+            document.getElementById('message').textContent = "Calculate Resistance & Tolerance";
+            document.getElementById('message').style.color = "#2c3e50";
+
+            // 1. Generate Values
+            // Band 1: 1-9 (Brown to White)
+            const b1 = Math.floor(Math.random() * 9) + 1; 
+            // Band 2: 0-9 (Black to White)
+            const b2 = Math.floor(Math.random() * 10);    
+            // Band 3: 0-6 (Black to Blue) - Keeps numbers reasonable
+            const b3 = Math.floor(Math.random() * 7);     
+            // Tolerance: Gold or Silver
+            const tIndex = Math.random() > 0.5 ? 0 : 1;   
+
+            const ohms = (b1 * 10 + b2) * Math.pow(10, b3);
+            const tolText = tolerances[tIndex].text;
+
+            currentResistor = {
+                ohms: ohms,
+                tolText: tolText,
+                fullString: formatValue(ohms, tolText)
+            };
+
+            // 2. Update Visuals
+            document.getElementById('band1').style.backgroundColor = colors[b1].hex;
+            document.getElementById('band2').style.backgroundColor = colors[b2].hex;
+            document.getElementById('band3').style.backgroundColor = colors[b3].hex;
+            document.getElementById('band4').style.backgroundColor = tolerances[tIndex].hex;
+
+            // 3. Generate Options
+            let options = [];
+            // Add correct answer
+            options.push({ ohms: ohms, tol: tolText, correct: true });
+
+            // Generate Distractors
+            while (options.length < 4) {
+                let type = Math.floor(Math.random() * 3);
+                let fakeOhms = ohms;
+                let fakeTol = tolText;
+
+                if (type === 0) {
+                    // Wrong Tolerance
+                    fakeTol = (tolText === '±5%') ? '±10%' : '±5%';
+                } else if (type === 1) {
+                    // Wrong Multiplier
+                    let shift = Math.random() > 0.5 ? 10 : 0.1;
+                    fakeOhms = ohms * shift;
+                } else {
+                    // Wrong Digits (similar range)
+                    let fakeB2 = (b2 + 1) % 10;
+                    fakeOhms = (b1 * 10 + fakeB2) * Math.pow(10, b3);
+                }
+
+                // Check for duplicates
+                let exists = options.some(o => o.ohms === fakeOhms && o.tol === fakeTol);
+                
+                // Filter out crazy values
+                if (!exists && fakeOhms >= 1) {
+                    options.push({ ohms: fakeOhms, tol: fakeTol, correct: false });
+                }
+            }
+
+            // Shuffle
+            options.sort(() => Math.random() - 0.5);
+
+            // Render Buttons
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.textContent = formatValue(opt.ohms, opt.tol);
+                btn.onclick = () => checkAnswer(opt, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(option, btnElement) {
+            if (!gameActive) return;
+            gameActive = false;
+
+            const btns = document.querySelectorAll('.options-grid button');
+
+            if (option.correct) {
+                score += 10;
+                streak++;
+                document.getElementById('message').textContent = "Correct!";
+                document.getElementById('message').style.color = "var(--success)";
+                btnElement.classList.add('btn-correct');
+            } else {
+                streak = 0;
+                document.getElementById('message').textContent = `Wrong! It was ${currentResistor.fullString}`;
+                document.getElementById('message').style.color = "var(--error)";
+                btnElement.classList.add('btn-wrong');
+                
+                // Highlight correct
+                btns.forEach(b => {
+                    if (b.textContent === currentResistor.fullString) {
+                        b.classList.add('btn-correct');
+                    }
+                });
+            }
+
+            document.getElementById('score').textContent = score;
+            document.getElementById('streak').textContent = streak;
+
+            setTimeout(newRound, 2000);
+        }
+
+        function toggleCheatSheet() {
+            const sheet = document.getElementById('cheat-sheet');
+            sheet.style.display = (sheet.style.display === 'block') ? 'none' : 'block';
+        }
+
+        // Init
+        newRound();
+
+    </script>
+</body>
+</html>
